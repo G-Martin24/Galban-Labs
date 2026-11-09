@@ -1,0 +1,6 @@
+{
+  "name": "Galban Labs - Desarrollo Web",
+  "description": "Portfolio y servicios de desarrollo web para negocios y emprendimientos por Galban Labs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
