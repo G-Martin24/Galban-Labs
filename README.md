@@ -10,7 +10,7 @@ Sitio web oficial de **Galban Labs**, marca freelance de desarrollo web fundada 
 - **Colores principales:** Azul marino oscuro (`#070b19`), Azul eléctrico, Cian (`#00c2ff`) y Púrpura (`#6e44ff`).
 - **Logo:** Logotipo original de Galban Labs con fondo blanco removido, preservando ícono, colores, proporciones y tipografía.
 - **Canal principal de contacto:** WhatsApp (+54 9 3765 093201 / [wa.me/5493765093201](https://wa.me/5493765093201))
-- **Email:** galbanmartin01@gmail.com
+- **Email:** galbanlabs.contacto@gmail.com
 - **Instagram:** [@galban_labs](https://www.instagram.com/galban_labs/)
 - **GitHub:** [G-Martin24](https://github.com/G-Martin24)
 

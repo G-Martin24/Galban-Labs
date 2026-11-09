@@ -44,7 +44,7 @@ export const BRAND_CONFIG = {
   whatsappNumber: "+54 9 3765 093201",
   whatsappUrl: "https://wa.me/5493765093201",
   whatsappDefaultMsg: "https://wa.me/5493765093201?text=Hola%20Mart%C3%ADn,%20vi%20la%20web%20de%20Galban%20Labs%20y%20quiero%20consultar%20por%20una%20p%C3%A1gina%20web.",
-  email: "galbanmartin01@gmail.com",
+  email: "galbanlabs.contacto@gmail.com",
   instagram: "@galban_labs",
   instagramUrl: "https://www.instagram.com/galban_labs/",
   github: "G-Martin24",
@@ -270,7 +270,7 @@ export const ABOUT_INFO = {
   greeting: "Hola, soy Martín Galban",
   paragraph1: "Soy estudiante de Ciencia de Datos e Inteligencia Artificial y desarrollador web en formación. Desde Galban Labs creo páginas web modernas, aplicaciones y soluciones digitales personalizadas para negocios, profesionales y emprendimientos.",
   paragraph2: "Me gusta transformar ideas en herramientas claras, funcionales y fáciles de usar. Trabajo de manera directa con cada cliente para entender sus necesidades, definir una propuesta y acompañar el proceso hasta la entrega.",
-  paragraph3: "Actualmente estoy construyendo mi portfolio y desarrollando proyectos propios como Cuenta Clara, Vitality IA y VITA ID.",
+  paragraph3: "Estos son algunos de mis proyectos propios, creados para explorar soluciones digitales en finanzas personales, bienestar e identificación médica de emergencia: Cuenta Clara, Vitality IA y VITA ID.",
   photoPath: "/assets/martin_galban.png",
   highlights: [
     {

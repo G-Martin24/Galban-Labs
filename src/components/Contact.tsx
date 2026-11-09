@@ -13,15 +13,18 @@ import {
   AlertCircle,
   CheckCircle2,
   ExternalLink,
-  MapPin
+  MapPin,
+  Loader2
 } from 'lucide-react';
 import { BRAND_CONFIG } from '../data/portfolioData';
+
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/myeeqkng';
 
 interface FormState {
   name: string;
   email: string;
   business: string;
-  service: string;
+  solution: string;
   message: string;
 }
 
@@ -31,17 +34,19 @@ interface FormErrors {
   message?: string;
 }
 
+type SubmissionStatus = 'idle' | 'loading' | 'success' | 'error';
+
 export const Contact: React.FC = () => {
   const [formData, setFormData] = useState<FormState>({
     name: '',
     email: '',
     business: '',
-    service: 'Landing page',
+    solution: 'Landing page',
     message: ''
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState<SubmissionStatus>('idle');
 
   const validate = (): boolean => {
     const errs: FormErrors = {};
@@ -50,7 +55,7 @@ export const Contact: React.FC = () => {
     }
     if (!formData.email.trim()) {
       errs.email = 'Por favor ingresá tu correo electrónico.';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
       errs.email = 'El formato de correo no es válido.';
     }
     if (!formData.message.trim()) {
@@ -63,10 +68,45 @@ export const Contact: React.FC = () => {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) {
-      setSubmitted(true);
+    if (!validate()) {
+      return;
+    }
+
+    setStatus('loading');
+
+    try {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          business: formData.business.trim(),
+          solution: formData.solution,
+          message: formData.message.trim()
+        })
+      });
+
+      if (response.ok) {
+        setStatus('success');
+        setFormData({
+          name: '',
+          email: '',
+          business: '',
+          solution: 'Landing page',
+          message: ''
+        });
+        setErrors({});
+      } else {
+        setStatus('error');
+      }
+    } catch {
+      setStatus('error');
     }
   };
 
@@ -217,189 +257,221 @@ export const Contact: React.FC = () => {
                 Completá el formulario para contarnos sobre tu negocio o servicio.
               </p>
 
-              {/* Prototype Disclaimer Banner required by user brief */}
-              <div className="mb-6 p-4 rounded-xl bg-blue-950/40 border border-blue-800/50 flex items-start gap-3 text-xs text-blue-200">
-                <AlertCircle className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold text-white">Aviso de contacto:</span> Este formulario es actualmente un prototipo visual interactivo. Para una respuesta inmediata, te recomendamos usar el botón directo de{' '}
-                  <a
-                    href={BRAND_CONFIG.whatsappDefaultMsg}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline text-cyan-300 font-semibold hover:text-cyan-200"
-                  >
-                    WhatsApp
-                  </a>.
+              {/* Accessible Feedback: Success Message */}
+              {status === 'success' && (
+                <div
+                  role="status"
+                  aria-live="polite"
+                  className="mb-6 p-4 rounded-2xl bg-emerald-950/70 border border-emerald-500/40 text-emerald-200 flex items-start gap-3 text-sm animate-in fade-in"
+                >
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="font-semibold text-white">
+                      ¡Mensaje enviado correctamente! Te responderé lo antes posible.
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {submitted ? (
-                <div className="p-8 text-center space-y-4 rounded-2xl bg-slate-950/80 border border-emerald-500/30 animate-in fade-in">
-                  <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center">
-                    <CheckCircle2 className="w-8 h-8" />
-                  </div>
-                  <h4 className="text-xl font-bold text-white">
-                    ¡Campos validados con éxito!
-                  </h4>
-                  <p className="text-sm text-slate-300 max-w-md mx-auto">
-                    Como este formulario es un prototipo visual sin base de datos, hacé clic a continuación para enviar tu consulta directamente a Martín por WhatsApp con los datos ya cargados:
-                  </p>
-                  <div className="pt-2">
-                    <a
-                      href={generateWhatsAppUrl()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl shadow-lg shadow-emerald-600/30 transition-all"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      <span>Enviar esta consulta por WhatsApp</span>
-                    </a>
-                  </div>
-                  <div className="pt-4">
-                    <button
-                      type="button"
-                      onClick={() => setSubmitted(false)}
-                      className="text-xs text-slate-400 hover:text-white underline"
-                    >
-                      Volver a editar formulario
-                    </button>
+              {/* Accessible Feedback: Error Message */}
+              {status === 'error' && (
+                <div
+                  role="alert"
+                  aria-live="assertive"
+                  className="mb-6 p-4 rounded-2xl bg-rose-950/70 border border-rose-500/40 text-rose-200 flex items-start gap-3 text-sm animate-in fade-in"
+                >
+                  <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="font-medium text-white">
+                      No pudimos enviar el mensaje. Probá nuevamente o escribime directamente por WhatsApp.
+                    </p>
                   </div>
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-                  {/* Name field */}
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+                {/* Name field */}
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="block text-xs font-medium text-slate-300 mb-1.5"
+                  >
+                    Nombre completo *
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    required
+                    disabled={status === 'loading'}
+                    value={formData.name}
+                    onChange={(e) => {
+                      setFormData({ ...formData, name: e.target.value });
+                      if (errors.name) {
+                        setErrors({ ...errors, name: undefined });
+                      }
+                    }}
+                    placeholder="Ej: Laura Gómez"
+                    aria-invalid={errors.name ? 'true' : 'false'}
+                    aria-describedby={errors.name ? 'name-error' : undefined}
+                    className={`w-full px-4 py-3 rounded-xl bg-slate-950/70 border ${
+                      errors.name ? 'border-rose-500' : 'border-slate-800'
+                    } text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-60 transition-colors`}
+                  />
+                  {errors.name && (
+                    <p id="name-error" className="mt-1 text-xs text-rose-400">
+                      {errors.name}
+                    </p>
+                  )}
+                </div>
+
+                {/* Email & Business 2-column */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label
-                      htmlFor="name"
+                      htmlFor="email"
                       className="block text-xs font-medium text-slate-300 mb-1.5"
                     >
-                      Nombre completo *
+                      Correo electrónico *
                     </label>
                     <input
-                      id="name"
+                      id="email"
+                      name="email"
+                      type="email"
+                      required
+                      disabled={status === 'loading'}
+                      value={formData.email}
+                      onChange={(e) => {
+                        setFormData({ ...formData, email: e.target.value });
+                        if (errors.email) {
+                          setErrors({ ...errors, email: undefined });
+                        }
+                      }}
+                      placeholder="tu@email.com"
+                      aria-invalid={errors.email ? 'true' : 'false'}
+                      aria-describedby={errors.email ? 'email-error' : undefined}
+                      className={`w-full px-4 py-3 rounded-xl bg-slate-950/70 border ${
+                        errors.email ? 'border-rose-500' : 'border-slate-800'
+                      } text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-60 transition-colors`}
+                    />
+                    {errors.email && (
+                      <p id="email-error" className="mt-1 text-xs text-rose-400">
+                        {errors.email}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="business"
+                      className="block text-xs font-medium text-slate-300 mb-1.5"
+                    >
+                      Nombre de tu negocio o emprendimiento
+                    </label>
+                    <input
+                      id="business"
+                      name="business"
                       type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Ej: Laura Gómez"
-                      className={`w-full px-4 py-3 rounded-xl bg-slate-950/70 border ${
-                        errors.name ? 'border-rose-500' : 'border-slate-800'
-                      } text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-colors`}
+                      disabled={status === 'loading'}
+                      value={formData.business}
+                      onChange={(e) => setFormData({ ...formData, business: e.target.value })}
+                      placeholder="Ej: Café Aroma / Taller Textil"
+                      className="w-full px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-800 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-60 transition-colors"
                     />
-                    {errors.name && (
-                      <p className="mt-1 text-xs text-rose-400">{errors.name}</p>
+                  </div>
+                </div>
+
+                {/* Solution selector */}
+                <div>
+                  <label
+                    htmlFor="solution"
+                    className="block text-xs font-medium text-slate-300 mb-1.5"
+                  >
+                    ¿Qué tipo de solución necesitás?
+                  </label>
+                  <select
+                    id="solution"
+                    name="solution"
+                    disabled={status === 'loading'}
+                    value={formData.solution}
+                    onChange={(e) => setFormData({ ...formData, solution: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-60 transition-colors"
+                  >
+                    <option value="Landing page">Landing page para captar clientes</option>
+                    <option value="Página web para negocio">Página web completa para negocio</option>
+                    <option value="Catálogo online">Catálogo online de productos</option>
+                    <option value="Integración con WhatsApp">Integración con WhatsApp</option>
+                    <option value="Aplicación a medida">Aplicación web a medida</option>
+                    <option value="Otro">Otra consulta</option>
+                  </select>
+                </div>
+
+                {/* Message field */}
+                <div>
+                  <label
+                    htmlFor="message"
+                    className="block text-xs font-medium text-slate-300 mb-1.5"
+                  >
+                    Mensaje o consulta *
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={4}
+                    required
+                    disabled={status === 'loading'}
+                    value={formData.message}
+                    onChange={(e) => {
+                      setFormData({ ...formData, message: e.target.value });
+                      if (errors.message) {
+                        setErrors({ ...errors, message: undefined });
+                      }
+                    }}
+                    placeholder="Contanos brevemente qué querés lograr con tu página web..."
+                    aria-invalid={errors.message ? 'true' : 'false'}
+                    aria-describedby={errors.message ? 'message-error' : undefined}
+                    className={`w-full px-4 py-3 rounded-xl bg-slate-950/70 border ${
+                      errors.message ? 'border-rose-500' : 'border-slate-800'
+                    } text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-60 transition-colors`}
+                  />
+                  {errors.message && (
+                    <p id="message-error" className="mt-1 text-xs text-rose-400">
+                      {errors.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
+                  <button
+                    type="submit"
+                    disabled={status === 'loading'}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-semibold text-white bg-slate-800 hover:bg-slate-700/90 border border-slate-700 disabled:bg-slate-900 disabled:text-slate-500 disabled:border-slate-800 rounded-xl transition-all cursor-pointer disabled:cursor-not-allowed"
+                  >
+                    {status === 'loading' ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
+                        <span>Enviando mensaje...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        <span>Enviar mensaje</span>
+                      </>
                     )}
-                  </div>
+                  </button>
 
-                  {/* Email & Business 2-column */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label
-                        htmlFor="email"
-                        className="block text-xs font-medium text-slate-300 mb-1.5"
-                      >
-                        Correo electrónico *
-                      </label>
-                      <input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="tu@email.com"
-                        className={`w-full px-4 py-3 rounded-xl bg-slate-950/70 border ${
-                          errors.email ? 'border-rose-500' : 'border-slate-800'
-                        } text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-colors`}
-                      />
-                      {errors.email && (
-                        <p className="mt-1 text-xs text-rose-400">{errors.email}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="business"
-                        className="block text-xs font-medium text-slate-300 mb-1.5"
-                      >
-                        Nombre de tu negocio o emprendimiento
-                      </label>
-                      <input
-                        id="business"
-                        type="text"
-                        value={formData.business}
-                        onChange={(e) => setFormData({ ...formData, business: e.target.value })}
-                        placeholder="Ej: Café Aroma / Taller Textil"
-                        className="w-full px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-800 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Service selector */}
-                  <div>
-                    <label
-                      htmlFor="service"
-                      className="block text-xs font-medium text-slate-300 mb-1.5"
-                    >
-                      ¿Qué tipo de solución necesitás?
-                    </label>
-                    <select
-                      id="service"
-                      value={formData.service}
-                      onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-colors"
-                    >
-                      <option value="Landing page">Landing page para captar clientes</option>
-                      <option value="Página web para negocio">Página web completa para negocio</option>
-                      <option value="Catálogo online">Catálogo online de productos</option>
-                      <option value="Integración con WhatsApp">Integración con WhatsApp</option>
-                      <option value="Aplicación a medida">Aplicación web a medida</option>
-                      <option value="Otro">Otra consulta</option>
-                    </select>
-                  </div>
-
-                  {/* Message field */}
-                  <div>
-                    <label
-                      htmlFor="message"
-                      className="block text-xs font-medium text-slate-300 mb-1.5"
-                    >
-                      Mensaje o consulta *
-                    </label>
-                    <textarea
-                      id="message"
-                      rows={4}
-                      value={formData.message}
-                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      placeholder="Contanos brevemente qué querés lograr con tu página web..."
-                      className={`w-full px-4 py-3 rounded-xl bg-slate-950/70 border ${
-                        errors.message ? 'border-rose-500' : 'border-slate-800'
-                      } text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-colors`}
-                    />
-                    {errors.message && (
-                      <p className="mt-1 text-xs text-rose-400">{errors.message}</p>
-                    )}
-                  </div>
-
-                  {/* Submit Button */}
-                  <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
-                    <button
-                      type="submit"
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-semibold text-white bg-slate-800 hover:bg-slate-700/90 border border-slate-700 rounded-xl transition-all"
-                    >
-                      <Send className="w-4 h-4" />
-                      <span>Validar y enviar</span>
-                    </button>
-
-                    <a
-                      href={generateWhatsAppUrl()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-xl shadow-md shadow-emerald-500/20 transition-all"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      <span>O enviar directo a WhatsApp</span>
-                    </a>
-                  </div>
-                </form>
-              )}
+                  <a
+                    href={generateWhatsAppUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-xl shadow-md shadow-emerald-500/20 transition-all"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>O enviar directo a WhatsApp</span>
+                  </a>
+                </div>
+              </form>
             </div>
           </div>
         </div>
