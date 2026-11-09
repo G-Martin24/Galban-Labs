@@ -4,15 +4,11 @@
  */
 
 import React from 'react';
-import { MessageCircle, Mail, Instagram, Github, ArrowUp, Code2, Heart } from 'lucide-react';
+import { MessageCircle, Mail, Instagram, Github, ArrowUp, Heart } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { BRAND_CONFIG, NAV_LINKS } from '../data/portfolioData';
 
-interface FooterProps {
-  onOpenDeployGuide: () => void;
-}
-
-export const Footer: React.FC<FooterProps> = ({ onOpenDeployGuide }) => {
+export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   const scrollToTop = () => {
@@ -128,18 +124,6 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDeployGuide }) => {
                 <Github className="w-4 h-4 text-cyan-400" />
                 <span>github.com/{BRAND_CONFIG.github}</span>
               </a>
-            </div>
-
-            {/* Quick link to guide for the client */}
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={onOpenDeployGuide}
-                className="inline-flex items-center gap-1.5 text-xs text-cyan-400/90 hover:text-cyan-300 transition-colors underline"
-              >
-                <Code2 className="w-3.5 h-3.5" />
-                <span>Guía: Cómo subir a GitHub y Vercel</span>
-              </button>
             </div>
           </div>
         </div>

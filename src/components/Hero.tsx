@@ -3,13 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
-import { ArrowRight, MessageCircle, Laptop, Smartphone, CheckCircle2 } from 'lucide-react';
+import React from 'react';
+import { ArrowRight, MessageCircle, CheckCircle2 } from 'lucide-react';
 import { BRAND_CONFIG } from '../data/portfolioData';
+import { HeroDeviceMockup } from './HeroDeviceMockup';
 
 export const Hero: React.FC = () => {
-  const [imgError, setImgError] = useState(false);
-
   return (
     <section
       id="inicio"
@@ -77,53 +76,9 @@ export const Hero: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Column: Visual of Laptop & Smartphone */}
+          {/* Right Column: Visual Mockup showing Desktop & Smartphone Screens */}
           <div className="lg:col-span-5 relative">
-            <div className="relative mx-auto max-w-lg lg:max-w-none">
-              {/* Decorative aura */}
-              <div className="absolute -inset-1.5 bg-gradient-to-r from-cyan-500/30 via-blue-600/30 to-purple-600/30 rounded-2xl blur-lg opacity-70 group-hover:opacity-100 transition duration-500" />
-
-              {/* Main device mockup frame */}
-              <div className="relative rounded-2xl overflow-hidden border border-slate-700/80 bg-slate-900/90 shadow-2xl shadow-black/60">
-                {!imgError ? (
-                  <img
-                    src="/src/assets/images/hero_devices_mockup_1794193697880.jpg"
-                    alt="Visualización de sitios web responsivos en laptop y smartphone creados por Galban Labs"
-                    className="w-full h-auto aspect-[16/9] object-cover transition-transform duration-500 hover:scale-[1.02]"
-                    onError={() => setImgError(true)}
-                  />
-                ) : (
-                  /* Stylized CSS fallback composition if image cannot load */
-                  <div className="w-full aspect-[16/9] bg-gradient-to-br from-slate-900 via-[#0b1126] to-[#101735] p-6 flex flex-col justify-between">
-                    <div className="flex items-center justify-between text-xs text-slate-400 border-b border-slate-800 pb-3">
-                      <div className="flex items-center gap-2">
-                        <Laptop className="w-4 h-4 text-cyan-400" />
-                        <span>Desktop & Mobile Viewport</span>
-                      </div>
-                      <Smartphone className="w-4 h-4 text-purple-400" />
-                    </div>
-                    <div className="space-y-3">
-                      <div className="h-6 w-3/4 bg-slate-800 rounded animate-pulse" />
-                      <div className="h-4 w-1/2 bg-slate-800/60 rounded" />
-                      <div className="grid grid-cols-3 gap-2 pt-2">
-                        <div className="h-16 bg-slate-800/40 rounded border border-cyan-500/20" />
-                        <div className="h-16 bg-slate-800/40 rounded border border-blue-500/20" />
-                        <div className="h-16 bg-slate-800/40 rounded border border-purple-500/20" />
-                      </div>
-                    </div>
-                    <div className="text-right text-xs text-cyan-400 font-medium">
-                      Galban Labs Preview
-                    </div>
-                  </div>
-                )}
-
-                {/* Subtle caption overlay */}
-                <div className="px-4 py-3 bg-[#070b19]/80 backdrop-blur-sm border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                  <span className="font-medium text-slate-300">Interfaces modernas y adaptadas</span>
-                  <span className="text-cyan-400">Mobile First · Rendimiento</span>
-                </div>
-              </div>
-            </div>
+            <HeroDeviceMockup />
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { Services } from './components/Services';
@@ -16,10 +16,8 @@ import { FAQ } from './components/FAQ';
 import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
-import { DeploymentGuideModal } from './components/DeploymentGuideModal';
 
 export default function App() {
-  const [isDeployGuideOpen, setIsDeployGuideOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#070b19] text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
@@ -57,16 +55,10 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <Footer onOpenDeployGuide={() => setIsDeployGuideOpen(true)} />
+      <Footer />
 
       {/* Floating WhatsApp Action Button */}
       <FloatingWhatsApp />
-
-      {/* Deployment & Setup Modal */}
-      <DeploymentGuideModal
-        isOpen={isDeployGuideOpen}
-        onClose={() => setIsDeployGuideOpen(false)}
-      />
     </div>
   );
 }
